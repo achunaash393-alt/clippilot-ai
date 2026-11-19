@@ -151,13 +151,16 @@ def home():
     earnings_total = sum(amounts.values())
     youtube_sources = [dict(x) for x in con.execute("SELECT * FROM youtube_sources ORDER BY id DESC LIMIT 20").fetchall()]
     con.close()
-    latest_clip=(session.get("latest_clip") if session.get("latest_clip") and (OUTPUT_DIR / session.get("latest_clip")).is_file() else None), youtube_sources=youtube_sources, total=len(rows), best_rate=f"₹{best:.2f}", clips=len(files),
+    latest_clip = session.get("latest_clip")
+    if latest_clip and not (OUTPUT_DIR / latest_clip).is_file():
+        latest_clip = None
+    return render_template_string(PAGE, latest_clip=latest_clip, youtube_sources=youtube_sources,
+        total=len(rows), best_rate=f"₹{best:.2f}", clips=len(files),
         submitted=counts["submitted"]+counts["paid"], campaigns=campaigns, clip_files=files,
         earnings=[dict(e) for e in earnings_rows], earnings_total=earnings_total,
         earnings_approved=amounts.get("approved",0), earnings_pending=amounts.get("pending",0),
         earnings_rejected=amounts.get("rejected",0),
         discovered=session.get("discovered_campaigns", []), discovery_error=session.pop("discovery_error", None))
-
 
 DISCOVERY_SOURCES = [
     ("CLIPPING", "https://clipping.net/c/discover"),
@@ -255,24 +258,24 @@ def _enrich_campaign(item):
             data["status"] = "Public page indicates campaign is paused or closed"
 
         platforms = ["YouTube", "TikTok", "Instagram", "Facebook", "X", "Kick"]
-        data["platforms"] = [p for p in platforms if re.search(r"(?i)\\b" + re.escape(p) + r"\\b", text)]
-        rates = re.findall(r"(?i)\\$\\s?[\\d,.]+\\s*(?:to\\s*\\$?\\s?[\\d,.]+)?\\s*/\\s*(?:100K|1K|1M)\\b", text)
+        data["platforms"] = [p for p in platforms if re.search(r"(?i)\b" + re.escape(p) + r"\b", text)]
+        rates = re.findall(r"(?i)\$\s?[\d,.]+\s*(?:to\s*\$?\s?[\d,.]+)?\s*/\s*(?:100K|1K|1M)\b", text)
         if not rates:
-            rates = re.findall(r"(?i)\\$\\s?[\\d,.]+\\s*/\\s*1K\\s*views", text)
+            rates = re.findall(r"(?i)\$\s?[\d,.]+\s*/\s*1K\s*views", text)
         if rates:
             data["rate_detail"] = " · ".join(dict.fromkeys(_clean_text(x) for x in rates[:4]))
 
-        budget = re.search(r"\\$([\\d,.]+)\\s*/\\s*\\$([\\d,.]+)", text)
+        budget = re.search(r"\$([\d,.]+)\s*/\s*\$([\d,.]+)", text)
         if budget:
             spent = float(budget.group(1).replace(",", ""))
             total = float(budget.group(2).replace(",", ""))
             left = max(0, total - spent)
             data["budget_left"] = f"${left:,.0f} of ${total:,.0f} shown remaining"
-        elif re.search(r"(?i)\\$[\\d,.]+\\s+in pools?", text):
-            pool = re.search(r"(?i)\\$[\\d,.]+\\s+in pools?", text)
+        elif re.search(r"(?i)\$[\d,.]+\s+in pools?", text):
+            pool = re.search(r"(?i)\$[\d,.]+\s+in pools?", text)
             data["budget_left"] = _clean_text(pool.group(0))
 
-        minimum = re.search(r"(?i)to qualify\\s*(?:from\\s*)?([\\d,.]+\\s*[KkMm]?)\\s*views", text)
+        minimum = re.search(r"(?i)to qualify\s*(?:from\s*)?([\d,.]+\s*[KkMm]?)\s*views", text)
         if minimum:
             data["minimum_views"] = minimum.group(1).replace(" ", "") + " views"
 
