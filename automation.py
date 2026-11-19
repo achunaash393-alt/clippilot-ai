@@ -39,6 +39,26 @@ a{color:#8fc5ee;text-decoration:none}a:hover{color:#c5e4fb}.muted{color:#9aa8b8}
 @media(max-width:600px){.workflow-head{gap:10px;padding:11px}.workflow-orb-wrap{width:66px;flex-basis:66px}.workflow-orb{transform:scale(.82)}.stage-track{gap:4px}.stage{font-size:9px;padding:8px 3px}}
 @media(prefers-reduced-motion:reduce){.workflow-orb{animation:none}}
 
+
+/* ClipPilot UI refresh v2 — match main dashboard */
+body{background:#0b1016;color:#edf3f8;letter-spacing:.005em}
+main{max-width:1080px;margin:25px auto;padding:0 20px 52px}
+h1{font-size:30px;letter-spacing:-.045em;margin:12px 0 4px;font-weight:720}
+.panel{background:#121a23;border:1px solid #293746;border-radius:12px;padding:18px;margin:13px 0}
+a{color:#91c6eb}a:hover{color:#d7edfb}
+.tag{background:#1b2b39;border:1px solid #344b5f;color:#c4dced;border-radius:6px;padding:5px 9px}
+.workflow-head{background:#121c26;border:1px solid #293746;border-radius:12px;padding:15px 18px}
+.workflow-orb{background:linear-gradient(145deg,#315b79,#172635);border-color:#6e9fc5;box-shadow:7px 7px 0 #0b121b,8px 8px 0 1px #38566d}
+.stage{background:#0f1821;border:1px solid #293746;border-radius:7px}
+.stage.active{background:#1b2b39;border-color:#6e9fc5}
+.stage.done{border-color:#426d5a}
+.stage.blocked{border-color:#806a49}
+.video{border-top:1px solid #293746;padding:13px 0}
+.warn{color:#e3c99d}
+.muted{color:#9aabba}
+@media(max-width:600px){main{margin:13px auto;padding:0 12px 38px}h1{font-size:25px}.panel{padding:14px}.workflow-head{padding:12px}.stage{font-size:9px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
 </style></head><body><main>
 <p><a href="/">← Back to ClipPilot</a></p><h1>Campaign automation</h1>
 <p class="muted">Free public-web discovery · refreshes every 20 seconds</p>
