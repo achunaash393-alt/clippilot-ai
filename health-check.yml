@@ -1,0 +1,11 @@
+name: ClipPilot scheduled check
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Explain current starter status
+        run: echo "Campaign API connectors are not configured yet. Add approved source integrations before enabling automated discovery."
