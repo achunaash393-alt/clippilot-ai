@@ -95,8 +95,8 @@ def home():
     totals = con.execute("SELECT status, COALESCE(SUM(amount),0) AS amount FROM earnings GROUP BY status").fetchall()
     amounts = {r["status"]: float(r["amount"] or 0) for r in totals}
     earnings_total = sum(amounts.values())
-    con.close()
     youtube_sources = [dict(x) for x in con.execute("SELECT * FROM youtube_sources ORDER BY id DESC LIMIT 20").fetchall()]
+    con.close()
     return render_template_string(PAGE, youtube_sources=youtube_sources, total=len(rows), best_rate=f"₹{best:.2f}", clips=len(files),
         submitted=counts["submitted"]+counts["paid"], campaigns=campaigns, clip_files=files,
         earnings=[dict(e) for e in earnings_rows], earnings_total=earnings_total,
