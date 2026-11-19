@@ -252,16 +252,18 @@ def _enrich_campaign(item):
         if len(response.content) > 2_000_000:
             return data
         text = _clean_text(BeautifulSoup(response.text, "html.parser").get_text(" ", strip=True))
-        if re.search(r"(?i)accepting clips|taking clips|live", text):
-            data["status"] = "Public page indicates clips are being accepted"
-        elif re.search(r"(?i)paused|closed|ended|not accepting", text):
+        if re.search(r"(?i)paused|closed|ended|not accepting", text):
             data["status"] = "Public page indicates campaign is paused or closed"
+        elif re.search(r"(?i)accepting clips|taking clips| live ", " " + text + " "):
+            data["status"] = "Public page indicates clips are being accepted"
 
         platforms = ["YouTube", "TikTok", "Instagram", "Facebook", "X", "Kick"]
         data["platforms"] = [p for p in platforms if re.search(r"(?i)\b" + re.escape(p) + r"\b", text)]
         rates = re.findall(r"(?i)\$\s?[\d,.]+\s*(?:to\s*\$?\s?[\d,.]+)?\s*/\s*(?:100K|1K|1M)\b", text)
         if not rates:
             rates = re.findall(r"(?i)\$\s?[\d,.]+\s*/\s*1K\s*views", text)
+        if not rates:
+            rates = re.findall(r"(?i)per\s*1K\s*views\s*\$\s?[\d,.]+", text)
         if rates:
             data["rate_detail"] = " · ".join(dict.fromkeys(_clean_text(x) for x in rates[:4]))
 
