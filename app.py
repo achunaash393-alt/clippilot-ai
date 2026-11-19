@@ -24,7 +24,7 @@ start_worker()
 PAGE = r"""
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ClipPilot AI — Neon Studio</title>
+<title>ClipPilot AI — Creator Studio</title>
 <style>
 :root{--bg:#070912;--panel:#101426;--panel2:#151b31;--line:#252d4b;--text:#f3f5ff;--muted:#929bb8;--cyan:#23e7ff;--blue:#5478ff;--violet:#a855f7;--green:#36e0b2;--pink:#ff4fd8;--shadow:0 0 26px rgba(35,231,255,.07),0 12px 38px rgba(0,0,0,.24)}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 75% -10%,rgba(84,120,255,.17),transparent 36%),radial-gradient(ellipse at 8% 18%,rgba(168,85,247,.10),transparent 30%),var(--bg);color:var(--text);font:14px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif}
@@ -32,8 +32,50 @@ a{color:#8ceeff;text-decoration:none}a:hover{color:#fff}button,.btn{border:1px s
 .shell{max-width:1440px;margin:auto;padding:24px 18px 60px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:22px}.sidebar{align-self:start;position:sticky;top:92px;background:rgba(16,20,38,.74);border:1px solid var(--line);border-radius:17px;padding:14px;box-shadow:var(--shadow)}.navlabel{color:#687392;font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;padding:12px 10px 7px}.nav a{display:flex;align-items:center;gap:11px;padding:10px;border-radius:10px;color:#aeb8d6;margin:3px 0;font-size:13px}.nav a:hover,.nav a.active{background:linear-gradient(90deg,rgba(35,231,255,.12),rgba(84,120,255,.08));color:#f4fdff;border:1px solid rgba(35,231,255,.15)}.navicon{width:20px;text-align:center;color:var(--cyan);font-size:15px}.sidefoot{border-top:1px solid var(--line);margin-top:14px;padding:14px 8px 3px;color:var(--muted);font-size:11px}
 main{min-width:0}.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:15px;margin:3px 0 20px}.eyebrow{color:var(--cyan);font-size:10px;font-weight:850;letter-spacing:.18em;text-transform:uppercase}.hero h1{font-size:clamp(25px,4vw,36px);letter-spacing:-.045em;line-height:1.1;margin:7px 0}.hero p{color:var(--muted);margin:0}.hero-actions{display:flex;gap:9px;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}.metric{position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(21,27,49,.95),rgba(12,16,31,.96));border:1px solid var(--line);border-radius:15px;padding:17px;box-shadow:var(--shadow)}.metric:after{content:"";position:absolute;width:90px;height:90px;border-radius:50%;right:-35px;top:-40px;background:var(--glow,rgba(35,231,255,.16));filter:blur(22px)}.metric small{color:var(--muted);font-size:11px}.metric strong{display:block;font-size:25px;letter-spacing:-.04em;margin-top:6px}.metric .micon{float:right;color:var(--accent,var(--cyan));font-size:18px}.section{margin-top:19px;scroll-margin-top:92px}.card{background:linear-gradient(145deg,rgba(17,22,41,.96),rgba(12,16,30,.96));border:1px solid var(--line);border-radius:16px;padding:19px;margin-bottom:15px;box-shadow:var(--shadow)}.cardhead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:13px}.card h2{font-size:16px;letter-spacing:-.02em;margin:0}.card p{color:var(--muted)}.sub{color:var(--muted);font-size:12px;margin:5px 0 0}.tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:99px;background:rgba(35,231,255,.08);border:1px solid rgba(35,231,255,.18);color:#9cf5ff;font-size:10px;font-weight:800}.notice{background:rgba(255,184,77,.07);border:1px solid rgba(255,184,77,.26);padding:12px 14px;border-radius:11px;color:#e7d5ae;margin-bottom:15px;font-size:12px}.row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1;min-width:145px}.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:650px}td,th{text-align:left;padding:11px 9px;border-bottom:1px solid rgba(75,88,128,.28);vertical-align:top}th{color:#7f8aa9;font-size:10px;text-transform:uppercase;letter-spacing:.1em}td{font-size:12px;color:#dce3fa}small,.muted{color:var(--muted)}.pill{display:inline-block;padding:4px 8px;border-radius:99px;background:rgba(84,120,255,.13);border:1px solid rgba(84,120,255,.22);font-size:10px;color:#c3d0ff}.btn-secondary{background:rgba(255,255,255,.035);border-color:#343d5a;color:#c9d3ed;box-shadow:none}.btn-small{padding:7px 10px;font-size:11px}.two{display:grid;grid-template-columns:1fr 1fr;gap:15px}.empty{padding:22px;text-align:center;color:var(--muted);border:1px dashed #343d5a;border-radius:12px}.earn-total{font-size:30px;font-weight:850;letter-spacing:-.04em;color:#e9fbff}.status-approved{color:var(--green)}.status-pending{color:#ffd17c}.status-rejected{color:#ff7b9c}.flash{padding:10px 13px;border-radius:10px;background:rgba(54,224,178,.08);border:1px solid rgba(54,224,178,.22);margin-bottom:12px;color:#b9f9e7}
 @media(max-width:1000px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.shell{grid-template-columns:190px minmax(0,1fr)}}@media(max-width:720px){header{height:62px}.topright .statusword{display:none}.shell{display:block;padding:16px 12px 45px}.sidebar{position:static;margin-bottom:17px;padding:8px;overflow-x:auto}.nav{display:flex;gap:4px;min-width:max-content}.navlabel,.sidefoot{display:none}.nav a{padding:9px 11px}.nav a span:last-child{white-space:nowrap}.hero{display:block}.hero-actions{margin-top:14px}.card{padding:15px}.two{grid-template-columns:1fr}.grid{gap:9px}.metric{padding:13px}.metric strong{font-size:21px}}
+
+/* Clean, organized interface — flat surfaces, no glow */
+:root{--bg:#0d1118;--panel:#151c26;--panel2:#1b2532;--line:#2a3544;--text:#edf2f7;--muted:#9aa8b8;--cyan:#63b3ed;--blue:#4f83cc;--violet:#8b7bd8;--green:#55b98b;--pink:#d77aa8;--shadow:none}
+body{background:var(--bg)}
+header{background:#111821;backdrop-filter:none;border-bottom:1px solid var(--line)}
+.brandmark{background:#24384b;color:#b9dcf5;box-shadow:none}
+.live-dot{box-shadow:none}
+.sidebar{background:var(--panel);box-shadow:none}
+.nav a:hover,.nav a.active{background:#202d3b;color:#f3f7fb;border:1px solid #34485b}
+.navicon{color:#8bbce3}
+.hero .eyebrow,.eyebrow{color:#8bbce3}
+.hero h1 span{background:none!important;color:var(--text)!important}
+.metric,.card{background:var(--panel);box-shadow:none;border:1px solid var(--line)}
+.metric:after{display:none}
+button,.btn{background:#294b68;border:1px solid #3b6688;color:#f4f8fc;box-shadow:none;transition:background .15s,border-color .15s}
+button:hover,.btn:hover{transform:none;background:#345d80;border-color:#6e9fc5;box-shadow:none}
+.btn-secondary{background:#202a36;border-color:#3a4655;color:#d4deea}
+input:focus,select:focus,textarea:focus{border-color:#6e9fc5;box-shadow:none}
+.tag{background:#202d3a;border:1px solid #3b4d60;color:#c4d8e9}
+.pill{background:#202d3a;border:1px solid #3b4d60;color:#c4d8e9}
+.flash{background:#172d27;border:1px solid #315b4b;color:#c3ead8}
+.section{margin-top:22px}
+.card{padding:20px}
+.cardhead{align-items:center}
+.card h2{font-size:17px}
+.grid{gap:14px}
+.metric{min-height:100px}
+.metric strong{font-size:26px}
+.two{align-items:start}
+form{min-width:0}
+table{min-width:580px}
+a{color:#8fc5ee}
+a:hover{color:#c5e4fb}
+@media(max-width:720px){
+ .card{padding:15px}
+ .section{margin-top:16px}
+ .metric{min-height:88px}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .hero h1{font-size:29px}
+ .topright .tag{display:none}
+}
+
 </style></head><body>
-<header><div class="brand"><div class="brandmark">✂</div><div>ClipPilot AI<small>Creator campaign intelligence</small></div></div><div class="topright"><span class="live-dot"></span><span class="statusword">SYSTEM ONLINE · LOCAL MVP</span><span class="tag">NEON STUDIO</span></div></header>
+<header><div class="brand"><div class="brandmark">✂</div><div>ClipPilot AI<small>Creator campaign intelligence</small></div></div><div class="topright"><span class="live-dot"></span><span class="statusword">SYSTEM ONLINE · LOCAL MVP</span><span class="tag">CREATOR STUDIO</span></div></header>
 <div class="shell"><aside class="sidebar"><div class="navlabel">Workspace</div><nav class="nav"><a class="active" href="#overview"><span class="navicon">◈</span><span>Overview</span></a><a href="#campaigns"><span class="navicon">⌕</span><span>Campaign Finder</span></a><a href="#clip-studio"><span class="navicon">▣</span><span>Clip Studio</span></a><a href="#my-clips"><span class="navicon">▶</span><span>My Clips</span></a><a href="#earnings"><span class="navicon">₹</span><span>My Earnings</span></a><a href="#connections"><span class="navicon">⌘</span><span>AI Connections</span></a><a href="/automation"><span class="navicon">⚡</span><span>Automation jobs</span></a></nav><div class="sidefoot">Built for creators<br><span style="color:#64718f">Campaigns · Clips · Insights</span></div></aside>
 <main><section id="overview" class="hero"><div><div class="eyebrow">Creator command centre</div><h1>Make every moment <span style="background:linear-gradient(90deg,var(--cyan),#9b8cff,var(--pink));background-clip:text;color:transparent">count.</span></h1><p>Your campaign workspace, clip production and earnings in one place.</p></div><div class="hero-actions"><a class="btn" href="#campaigns">＋ Add campaign</a><a class="btn btn-secondary" href="#clip-studio">Create a clip ↗</a></div></section>
 {% with messages = get_flashed_messages() %}{% for message in messages %}<div class="flash">{{message}}</div>{% endfor %}{% endwith %}
