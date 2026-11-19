@@ -30,7 +30,7 @@ a{color:#6deaff}.muted{color:#9aa8c7}.tag{color:#8ef1ff;border:1px solid #35536b
 <p class="muted">Before editing, verify the channel, campaign rules and creator permission. ClipPilot does not download or publish videos.</p></div>
 {% for j in jobs %}<div class="panel"><b>{{j.campaign_name}}</b> <span class="tag">{{j.status}}</span>
 <p class="muted">Job #{{j.id}} · {{j.message}}</p>
-{% for v in j.videos %}<div class="video"><b>{{v.title}}</b><p class="muted">{{v.channel_title}} · {{v.published_at}} · {{v.source}}</p><a target="_blank" rel="noopener" href="{{v.url}}">Open YouTube video ↗</a></div>{% endfor %}</div>
+{% for v in j.videos %}<div class="video"><b>{{v.title}}</b><p class="muted">{{v.channel_title}} · {{v.source}} · Title match: {{v.match_score}}%</p><p class="muted">{{v.match_note}}</p><a target="_blank" rel="noopener" href="{{v.url}}">Open YouTube video ↗</a></div>{% endfor %}</div>
 {% else %}<div class="panel">No jobs yet. Start discovery from a saved campaign.</div>{% endfor %}
 </main></body></html>
 """
@@ -116,14 +116,38 @@ def process(job_id):
               ("Searching public web results; no API key required.", now(), job_id))
     c.commit()
     try:
-        found = public_search('site:youtube.com/watch "' + campaign_name.replace('"', " ") + '"')
-        if not found:
-            found = public_search("YouTube " + campaign_name + " official videos")
+        # Search a few distinct public-web patterns, then merge duplicate video URLs.
+        safe_name = campaign_name.replace('"', " ").strip()
+        queries = [
+            'site:youtube.com/watch "' + safe_name + '"',
+            'site:youtube.com/shorts "' + safe_name + '"',
+            '"' + safe_name + '" YouTube official video',
+        ]
+        merged = {}
+        search_count = 0
+        for query in queries:
+            results = public_search(query)
+            search_count += 1
+            for video in results:
+                merged.setdefault(video["url"], video)
+
+        # Rank only title-text similarity. This is a relevance hint, not identity or rights verification.
+        name_tokens = {t.lower() for t in re.findall(r"[A-Za-z0-9]{3,}", safe_name)}
+        found = []
+        for video in merged.values():
+            title_tokens = {t.lower() for t in re.findall(r"[A-Za-z0-9]{3,}", video.get("title", ""))}
+            matched = sorted(name_tokens & title_tokens)
+            score = round(100 * len(matched) / max(1, len(name_tokens)))
+            video["match_score"] = score
+            video["match_note"] = ("Matched words: " + ", ".join(matched)) if matched else "No campaign-name words matched the title."
+            found.append(video)
+        found.sort(key=lambda item: item["match_score"], reverse=True)
+        found = found[:30]
         status = "review_required"
         if found:
-            message = "Found %d public video candidates. Verify creator identity, campaign eligibility and clipping rights." % len(found)
+            message = "Searched %d public query patterns and found %d unique video candidates. Sorted by title-word match; channel identity, campaign eligibility and clipping rights remain unverified." % (search_count, len(found))
         else:
-            message = "No matching public video candidates found. Search may be blocked or the campaign name may be too broad."
+            message = "No public video candidates found across %d search patterns. Search may be blocked or the campaign name may be too broad." % search_count
         c.execute("UPDATE automation_jobs SET status=?,message=?,videos=?,updated_at=? WHERE id=?",
                   (status, message, json.dumps(found), now(), job_id))
         c.commit()
