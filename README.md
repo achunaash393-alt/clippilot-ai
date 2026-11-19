@@ -38,3 +38,15 @@ Open http://localhost:5000
 - Set a strong unique `SECRET_KEY`.
 - Never commit API tokens, passwords, OAuth secrets, or `.env` files.
 - Use OAuth and least-privilege permissions.
+
+
+## Public campaign discovery
+
+The dashboard includes a user-triggered scanner for the public campaign directories of CLIPPING and Content Rewards. It reads publicly accessible pages only, with short timeouts and a bounded response size. It does not log in, bypass CAPTCHAs/access controls, apply to campaigns, submit clips, or claim campaign eligibility. Always open the official campaign page and verify the current brief, rights, supported platforms, view thresholds, budget and payout terms before making clips.
+
+If a marketplace changes its public page layout or blocks automated requests, use the official directory links shown in the dashboard. No marketplace API access is assumed.
+
+
+## India + Indian bank payout preference
+
+The dashboard is configured to prioritize campaigns whose platform documents bank withdrawals. Content Rewards documents withdrawal from its creator balance through Whop to a bank account, and says bank availability spans 200+ countries; an Indian creator must still confirm that India and their own bank payout route are offered in their Whop payout settings and complete KYC. CLIPPING's published payout methods are PayPal, USDT (Ethereum), and USDC (Ethereum), so it is marked as not matching a bank-first preference. This is a platform-level filter, not a guarantee that every campaign accepts Indian creators or pays to an Indian bank. Always verify campaign-level geography, payout method, fees, currency conversion, KYC and terms before applying.

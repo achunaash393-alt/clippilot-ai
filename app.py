@@ -1,7 +1,10 @@
-import os, sqlite3, subprocess, uuid
+import os, sqlite3, subprocess, uuid, re
 from datetime import datetime, date
 from pathlib import Path
-from flask import Flask, request, redirect, url_for, flash, render_template_string, send_from_directory
+from flask import Flask, request, redirect, url_for, flash, render_template_string, send_from_directory, session
+import requests
+from bs4 import BeautifulSoup
+from urllib.parse import urljoin, urlparse
 
 APP_DIR = Path(__file__).parent
 DATA_DIR = Path(os.getenv("DATA_DIR", APP_DIR / "data"))
@@ -32,7 +35,7 @@ small{color:#9eacc7}.pill{padding:4px 8px;border-radius:99px;background:#20365f;
 a{color:#8db4ff}.notice{background:#2a2415;border:1px solid #6d5825;padding:12px;border-radius:9px;margin-bottom:15px}
 @media(max-width:650px){table{font-size:13px}td,th{padding:7px}}
 </style></head><body>
-<header><h1>✂️ ClipPilot AI</h1><div class="muted">Campaign ranking · clip production · submission tracker</div></header>
+<header><h1>✂️ ClipPilot AI</h1><div class="muted">India bank-first campaign discovery · campaign ranking · clip production</div></header>
 <main>
 <div class="notice"><b>Starter mode:</b> campaign discovery and publishing integrations are not connected yet. Add campaigns you are eligible for, use footage you have permission to edit, and review submissions before sending.</div>
 <div class="grid">
@@ -41,7 +44,41 @@ a{color:#8db4ff}.notice{background:#2a2415;border:1px solid #6d5825;padding:12px
 <div class="card"><small>Clips created</small><div class="metric">{{ clips }}</div></div>
 <div class="card"><small>Submissions tracked</small><div class="metric">{{ submitted }}</div></div>
 </div>
-<div class="card"><h2>1. Add a campaign</h2>
+
+<div class="card">
+<h2>India creator settings</h2>
+<div class="row">
+  <div><b>Creator country</b><p>India 🇮🇳</p></div>
+  <div><b>Preferred payout</b><p>Indian bank account (INR)</p></div>
+  <div><b>Campaign filter</b><p>Prioritize bank-withdrawable campaigns</p></div>
+</div>
+<p class="muted">A campaign is only marked bank-compatible when its platform documents bank withdrawal. Final India eligibility, KYC, fees, currency conversion and bank availability must still be confirmed in your payout account before applying.</p>
+</div>
+<div class="card">
+<h2>1. Find public campaigns automatically</h2>
+<p class="muted">Scan public campaign directories. This does not sign in, bypass access controls, apply, or submit anything for you.</p>
+<form method="post" action="/discover">
+<button type="submit">🔎 Search public campaigns now</button>
+</form>
+<div class="row" style="margin-top:12px">
+<a class="btn" href="https://contentrewards.com/c/discover" target="_blank" rel="noopener">Open Content Rewards</a>
+<a class="btn" href="https://clipping.net/c/discover" target="_blank" rel="noopener">Open CLIPPING</a>
+</div>
+{% if discovery_error %}<p class="notice">{{ discovery_error }}</p>{% endif %}
+{% if discovered %}
+<h3>Public results ({{ discovered|length }})</h3>
+<p class="muted">India + bank payout preference is active. Campaigns are ranked by documented payout compatibility, not just advertised rate. Confirm Indian bank withdrawal, KYC, fees, currency conversion, eligibility and campaign rules on the official site before applying.</p>
+{% for d in discovered %}
+<div style="border-top:1px solid #273653;padding:12px 0">
+<b>{{ d.name }}</b> <span class="pill">{{ d.source }}</span><p><b>Payout fit:</b> {{ d.bank_fit }}</p>
+{% if d.pay %}<p style="margin:6px 0">Pay: {{ d.pay }}</p>{% endif %}
+{% if d.detail %}<small>{{ d.detail }}</small>{% endif %}
+<p style="margin:8px 0"><a href="{{ d.url }}" target="_blank" rel="noopener">Open campaign / verify terms ↗</a></p>
+</div>
+{% endfor %}
+{% endif %}
+</div>
+<div class="card"><h2>2. Add a campaign manually</h2>
 <form method="post" action="/campaign">
 <label>Campaign / creator name</label><input name="name" required placeholder="e.g. Creator campaign">
 <label>Campaign URL</label><input name="url" type="url" placeholder="https://...">
@@ -50,20 +87,20 @@ a{color:#8db4ff}.notice{background:#2a2415;border:1px solid #6d5825;padding:12px
 <div><label>Deadline (optional)</label><input name="deadline" type="date"></div></div>
 <label>Requirements / notes</label><textarea name="notes" rows="2" placeholder="Allowed platforms, minimum views, source footage rules..."></textarea>
 <button type="submit">Save campaign</button></form></div>
-<div class="card"><h2>2. Campaign comparison</h2>
+<div class="card"><h2>3. Campaign comparison</h2>
 {% if campaigns %}<table><tr><th>Campaign</th><th>Rate / 1K</th><th>Cap</th><th>Deadline</th><th>Score</th><th>Action</th></tr>
 {% for c in campaigns %}<tr><td><b>{{c.name}}</b><br><small>{{c.notes or ''}}</small>{% if c.url %}<br><a href="{{c.url}}" target="_blank" rel="noopener">Open campaign ↗</a>{% endif %}</td>
 <td>₹{{"%.2f"|format(c.rate)}}</td><td>{{ "₹%.0f"|format(c.cap) if c.cap else "—" }}</td><td>{{c.deadline or "—"}}</td><td><span class="pill">{{c.score}} / 100</span></td>
 <td><form method="post" action="/status/{{c.id}}"><select name="status"><option {{'selected' if c.status=='research' else ''}}>research</option><option {{'selected' if c.status=='applied' else ''}}>applied</option><option {{'selected' if c.status=='accepted' else ''}}>accepted</option><option {{'selected' if c.status=='submitted' else ''}}>submitted</option><option {{'selected' if c.status=='paid' else ''}}>paid</option></select><button>Update</button></form></td></tr>{% endfor %}</table>
 {% else %}<p class="muted">No campaigns yet. Add your first campaign above.</p>{% endif %}</div>
-<div class="card"><h2>3. Create a short clip</h2><p class="muted">Upload a video file you own or are authorized to edit. This uses FFmpeg to crop a selected segment into a vertical 9:16 MP4.</p>
+<div class="card"><h2>4. Create a short clip</h2><p class="muted">Upload a video file you own or are authorized to edit. This uses FFmpeg to crop a selected segment into a vertical 9:16 MP4.</p>
 <form method="post" action="/make-clip" enctype="multipart/form-data">
 <label>Source video</label><input type="file" name="video" accept="video/*" required>
 <div class="row"><div><label>Start time (seconds)</label><input type="number" name="start" min="0" step="0.1" value="0" required></div><div><label>Duration (seconds)</label><input type="number" name="duration" min="1" max="180" step="0.1" value="30" required></div></div>
 <button type="submit">Create vertical clip</button></form>
 {% if clip_files %}<p><b>Created clips</b></p>{% for f in clip_files %}<p><a href="/clips/{{f}}">{{f}} ↓</a></p>{% endfor %}{% endif %}
 </div>
-<div class="card"><h2>4. Important next integrations</h2><p class="muted">Connect approved campaign APIs or feeds, AI moment detection, YouTube OAuth, Instagram professional-account publishing, and payout reporting. Never enter platform passwords here.</p>
+<div class="card"><h2>5. Important next integrations</h2><p class="muted">Connect approved campaign APIs or feeds, AI moment detection, YouTube OAuth, Instagram professional-account publishing, and payout reporting. Never enter platform passwords here.</p>
 </div>
 </main></body></html>
 """
@@ -103,7 +140,122 @@ def home():
     counts = {s: sum(1 for r in rows if r["status"] == s) for s in ["submitted","paid"]}
     con.close()
     return render_template_string(PAGE, total=len(rows), best_rate=f"₹{best:.2f}", clips=len(files),
-        submitted=counts["submitted"]+counts["paid"], campaigns=campaigns, clip_files=files)
+        submitted=counts["submitted"]+counts["paid"], campaigns=campaigns, clip_files=files,
+        discovered=session.get("discovered_campaigns", []), discovery_error=session.pop("discovery_error", None))
+
+
+DISCOVERY_SOURCES = [
+    ("CLIPPING", "https://clipping.net/c/discover"),
+    ("Content Rewards", "https://contentrewards.com/c/discover"),
+]
+
+def _clean_text(value):
+    return " ".join((value or "").split())
+
+def _extract_public_campaigns(source_name, page_url, html):
+    """Extract visible campaign cards/links from a public directory page."""
+    soup = BeautifulSoup(html, "html.parser")
+    found = []
+    seen = set()
+    for a in soup.find_all("a", href=True):
+        href = urljoin(page_url, a["href"])
+        parsed = urlparse(href)
+        if parsed.scheme not in {"http", "https"}:
+            continue
+        if parsed.netloc not in {"clipping.net", "www.clipping.net", "contentrewards.com", "www.contentrewards.com"}:
+            continue
+
+        anchor_text = _clean_text(a.get_text(" ", strip=True))
+        parent = a
+        # Campaign cards generally wrap the title and pay details in a nearby card.
+        for _ in range(4):
+            if parent.parent:
+                parent = parent.parent
+            text = _clean_text(parent.get_text(" ", strip=True))
+            if len(text) > len(anchor_text) + 25:
+                break
+        else:
+            text = anchor_text
+
+        path = parsed.path.lower()
+        looks_like_campaign = (
+            "campaign" in (anchor_text + " " + text).lower()
+            or (source_name == "CLIPPING" and path.startswith("/c/") and path != "/c/discover")
+            or (source_name == "Content Rewards" and path.startswith("/c/") and path != "/c/discover")
+        )
+        if not looks_like_campaign:
+            continue
+
+        # Avoid navigation links and generic category pages.
+        if not anchor_text and len(text) < 20:
+            continue
+        title = anchor_text
+        title = re.sub(r"\s+", " ", title).strip()
+        if not title or title.lower() in {"discover", "view all", "see all", "campaigns"}:
+            continue
+
+        # Keep the pay/terms excerpt short and avoid duplicating the title.
+        excerpt = text.replace(anchor_text, " ", 1).strip() if anchor_text else text
+        excerpt = _clean_text(excerpt)
+        pay_match = re.search(
+            r"(?i)(?:pays?\s*)?((?:\$|€|£)\s?[\d,.]+(?:\s*(?:to|–|-|—)\s*(?:\$|€|£)?\s?[\d,.]+)?\s*(?:/\s*(?:100K|1K|1M)|per\s*1M|in\s*pools)?|\$[\d,.]+\s*(?:pool|budget))",
+            text
+        )
+        pay = pay_match.group(0) if pay_match else ""
+        # A stable key avoids duplicate cards from repeated page sections.
+        key = (source_name, href)
+        if key in seen:
+            continue
+        seen.add(key)
+        found.append({
+            "source": source_name,
+            "name": title[:100],
+            "url": href,
+            "pay": pay[:100],
+            "detail": excerpt[:120],
+        })
+    return found
+
+@app.post("/discover")
+def discover_campaigns():
+    results = []
+    errors = []
+    headers = {"User-Agent": "ClipPilotAI/1.0 (public campaign directory discovery; contact: site owner)"}
+    for source_name, page_url in DISCOVERY_SOURCES:
+        try:
+            response = requests.get(page_url, headers=headers, timeout=12)
+            response.raise_for_status()
+            if len(response.content) > 5_000_000:
+                errors.append(f"{source_name}: response too large; skipped.")
+                continue
+            results.extend(_extract_public_campaigns(source_name, page_url, response.text))
+        except requests.RequestException as exc:
+            errors.append(f"{source_name}: could not load public directory ({type(exc).__name__}).")
+    # Rank sources by compatibility with the configured India + Indian-bank preference.
+    # Content Rewards documents bank withdrawal through Whop; India-specific availability
+    # must still be confirmed in the creator's Whop payout settings.
+    # CLIPPING documents PayPal, USDT (ETH), and USDC (ETH), not direct bank transfer.
+    for item in results:
+        if item["source"] == "Content Rewards":
+            item["bank_rank"] = 1
+            item["bank_fit"] = "Potential match — bank withdrawal is documented via Whop; confirm India is offered in your Whop payout settings."
+        elif item["source"] == "CLIPPING":
+            item["bank_rank"] = 3
+            item["bank_fit"] = "Not a bank-first match — documented campaign payouts are PayPal, USDT or USDC, not direct bank transfer."
+        else:
+            item["bank_rank"] = 2
+            item["bank_fit"] = "Unverified — check official payout terms."
+    results.sort(key=lambda item: (item["bank_rank"], item["source"], item["name"].lower()))
+    # Keep results bounded and stable for mobile.
+    session["discovered_campaigns"] = results[:60]
+    if not results:
+        session["discovery_error"] = (
+            "No campaign cards could be read right now. The sites may have changed their public page layout or blocked automated requests. "
+            + "Use the official directory links above; no login or access controls were bypassed."
+        )
+    elif errors:
+        session["discovery_error"] = "Some sources could not be scanned: " + " ".join(errors)
+    return redirect(url_for("home"))
 
 @app.post("/campaign")
 def add_campaign():
