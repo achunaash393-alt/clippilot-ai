@@ -192,6 +192,23 @@ td{font-size:12px}
 @media(max-width:390px){.hero-visual{display:none}.hero h1{font-size:25px}.topright .statusword{display:none}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 
+
+/* ClipPilot typography + text motion v1 */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+body{font-family:'DM Sans','Avenir Next','Segoe UI',sans-serif;font-feature-settings:'ss01' on}
+h1,h2,h3,.brand,.metric strong,.earn-total{font-family:'Space Grotesk','DM Sans',sans-serif;letter-spacing:-.035em}
+.hero .eyebrow{animation:text-rise .55s both}
+.hero h1{animation:text-rise .7s .06s both}
+.hero p{animation:text-rise .7s .13s both}
+.cardhead h2,.metric small{animation:text-soft-in .55s both}
+.metric strong{animation:number-pop .55s .08s both}
+.nav a{transition:background .18s ease,color .18s ease,transform .18s ease}
+.nav a:hover{transform:translateX(2px)}
+@keyframes text-rise{from{opacity:0;transform:translateY(9px);filter:blur(2px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+@keyframes text-soft-in{from{opacity:0}to{opacity:1}}
+@keyframes number-pop{from{opacity:.35;transform:translateY(5px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){.hero .eyebrow,.hero h1,.hero p,.cardhead h2,.metric small,.metric strong{animation:none!important}.nav a{transition:none!important}}
+
 </style></head><body>
 <header><div class="brand"><div class="brandmark">✂</div><div>ClipPilot AI<small>Creator campaign intelligence</small></div></div><div class="topright"><span class="live-dot"></span><span class="statusword">SYSTEM ONLINE · LOCAL MVP</span><span class="tag">CREATOR STUDIO</span></div></header>
 <div class="shell"><aside class="sidebar"><div class="navlabel">Workspace</div><nav class="nav"><a class="active" href="#overview"><span class="navicon">◈</span><span>Overview</span></a><a href="#campaigns"><span class="navicon">⌕</span><span>Campaign Finder</span></a><a href="#clip-studio"><span class="navicon">▣</span><span>Clip Studio</span></a><a href="#my-clips"><span class="navicon">▶</span><span>My Clips</span></a><a href="#earnings"><span class="navicon">₹</span><span>My Earnings</span></a><a href="#connections"><span class="navicon">⌘</span><span>AI Connections</span></a><a href="/automation"><span class="navicon">⚡</span><span>Automation jobs</span></a></nav><div class="sidefoot">Built for creators<br><span style="color:#64718f">Campaigns · Clips · Insights</span></div></aside>
