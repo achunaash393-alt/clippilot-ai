@@ -120,6 +120,78 @@ a:hover{color:#c5e4fb}
 @media(max-width:600px){.studio-stage{grid-template-columns:95px minmax(0,1fr);gap:10px;padding:12px}.studio-object{height:112px}.studio-frame{transform:scale(.78) rotateY(-18deg)}}
 @media(prefers-reduced-motion:reduce){.studio-frame{animation:none}.btn,button,.metric{transition:none}}
 
+
+/* ClipPilot UI refresh v2 — editorial dashboard, consistent spacing, accessible controls */
+:root{--bg:#0b1016;--panel:#121a23;--panel2:#182330;--line:#293746;--text:#edf3f8;--muted:#9aaaba;--cyan:#8fc5ee;--blue:#4e82ae;--shadow:none}
+body{background:#0b1016;color:var(--text);letter-spacing:.005em}
+header{height:66px;padding-left:max(20px,calc((100% - 1360px)/2));padding-right:max(20px,calc((100% - 1360px)/2));background:#0e151d;border-bottom:1px solid #263442}
+.brand{font-size:16px;gap:10px}.brandmark{width:34px;height:34px;border-radius:9px;background:#24435c;color:#e6f4ff;font-size:18px}
+.brand small{letter-spacing:.1em;font-size:9px}.topright{font-size:10px;letter-spacing:.07em}
+.shell{max-width:1360px;grid-template-columns:205px minmax(0,1fr);gap:25px;padding-top:25px}
+.sidebar{background:#101821;border:1px solid #263442;border-radius:12px;padding:11px;top:83px}
+.navlabel{padding:11px 10px 8px;color:#718397;font-size:9px;letter-spacing:.14em}
+.nav a{padding:10px 11px;border-radius:8px;color:#aebdca;font-size:12px;border:1px solid transparent}
+.nav a.active{background:#1b2b39;border:1px solid #30485d;color:#f1f7fb}
+.navicon{color:#8fc5ee;font-size:14px}
+.sidefoot{border-color:#293746;color:#a1b1c0}
+.hero{align-items:center;padding:24px 25px;margin:0 0 17px;background:#121c26;border:1px solid #293746;border-radius:13px;min-height:175px}
+.hero h1{font-size:clamp(27px,3.4vw,38px);font-weight:720;letter-spacing:-.05em}
+.hero p{font-size:13px;color:#a8b6c3}
+.hero .eyebrow,.eyebrow{color:#91c6eb;letter-spacing:.14em;font-size:9px}
+.hero-visual{margin:0 8px}
+.hero-actions{gap:8px}
+.grid{gap:11px}
+.metric{background:#121a23;border:1px solid #293746;border-radius:11px;padding:15px;min-height:92px}
+.metric strong{font-size:24px;font-weight:700}.metric small{font-size:10px;color:#9aabba}
+.card{background:#121a23;border:1px solid #293746;border-radius:12px;padding:19px;margin-bottom:12px}
+.card h2{font-size:16px;font-weight:680;letter-spacing:-.02em}
+.cardhead{margin-bottom:15px}
+.sub,.card p{color:#9aabba}
+.tag,.pill{background:#1b2b39;border:1px solid #344b5f;color:#c4dced;border-radius:6px;font-weight:600}
+button,.btn{background:#285273;border:1px solid #47789c;border-radius:8px;padding:10px 14px;color:#f4f9fc;font-size:12px;font-weight:650;box-shadow:none}
+button:hover,.btn:hover{background:#326487;border-color:#6d9fc2;transform:translateY(-1px);box-shadow:none}
+.btn-secondary{background:#1a2631;border-color:#344554;color:#d4e0e9}
+.btn-secondary:hover{background:#233443}
+input,select,textarea{background:#0d151d;border:1px solid #30404e;border-radius:8px;color:#edf3f8;padding:11px 12px;font-size:13px}
+input:focus,select:focus,textarea:focus{border-color:#7fb4dc;box-shadow:0 0 0 2px #7fb4dc20}
+label{color:#b8c7d3;font-size:11px;letter-spacing:.01em}
+.notice{background:#241f16;border:1px solid #574a32;color:#e3d4b8;border-radius:9px}
+.flash{border-radius:9px}
+.campaign-result{padding:17px 0}
+.campaign-facts>div{background:#0f1821;border:1px solid #293746;border-radius:8px}
+.download-ready{background:#14271f;border:1px solid #315743;border-radius:9px}
+.studio-stage{background:#0f1821;border-color:#293746;border-radius:11px}
+.tablewrap{border:1px solid #293746;border-radius:9px}
+table{min-width:560px}
+td,th{border-bottom:1px solid #293746;padding:12px 10px}
+th{color:#8296a8;font-size:9px;letter-spacing:.12em}
+td{font-size:12px}
+.empty{border-color:#344554;color:#9aabba}
+.section{margin-top:17px;scroll-margin-top:82px}
+@media(max-width:900px){.shell{grid-template-columns:180px minmax(0,1fr);gap:15px}.hero{padding:20px}}
+@media(max-width:720px){
+ header{height:60px;padding:0 13px}
+ .shell{display:block;padding:12px 11px 38px}
+ .sidebar{position:static;margin:0 0 13px;padding:6px;border-radius:9px;overflow-x:auto}
+ .nav{display:flex;gap:4px;min-width:max-content}
+ .nav a{padding:8px 10px;font-size:11px;margin:0}
+ .hero{display:flex;align-items:center;padding:17px;min-height:0}
+ .hero-visual{display:grid;width:88px;height:90px;flex:0 0 88px}
+ .clip-core{transform:scale(.62)}
+ .hero h1{font-size:26px}
+ .hero-actions{margin-top:11px}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .metric{min-height:82px;padding:11px}
+ .metric strong{font-size:21px}
+ .card{padding:14px}
+ .two{grid-template-columns:1fr}
+ .studio-stage{grid-template-columns:90px minmax(0,1fr)}
+ .studio-object{height:105px}
+ .campaign-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:390px){.hero-visual{display:none}.hero h1{font-size:25px}.topright .statusword{display:none}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
 </style></head><body>
 <header><div class="brand"><div class="brandmark">✂</div><div>ClipPilot AI<small>Creator campaign intelligence</small></div></div><div class="topright"><span class="live-dot"></span><span class="statusword">SYSTEM ONLINE · LOCAL MVP</span><span class="tag">CREATOR STUDIO</span></div></header>
 <div class="shell"><aside class="sidebar"><div class="navlabel">Workspace</div><nav class="nav"><a class="active" href="#overview"><span class="navicon">◈</span><span>Overview</span></a><a href="#campaigns"><span class="navicon">⌕</span><span>Campaign Finder</span></a><a href="#clip-studio"><span class="navicon">▣</span><span>Clip Studio</span></a><a href="#my-clips"><span class="navicon">▶</span><span>My Clips</span></a><a href="#earnings"><span class="navicon">₹</span><span>My Earnings</span></a><a href="#connections"><span class="navicon">⌘</span><span>AI Connections</span></a><a href="/automation"><span class="navicon">⚡</span><span>Automation jobs</span></a></nav><div class="sidefoot">Built for creators<br><span style="color:#64718f">Campaigns · Clips · Insights</span></div></aside>
