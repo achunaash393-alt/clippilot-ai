@@ -22,15 +22,37 @@ main{max-width:960px;margin:24px auto;padding:0 16px 48px}.panel{background:#151
 a{color:#8fc5ee;text-decoration:none}a:hover{color:#c5e4fb}.muted{color:#9aa8b8}.tag{color:#c4d8e9;border:1px solid #3b4d60;border-radius:20px;padding:4px 9px;font-size:11px}
 .video{border-top:1px solid #2a3544;padding:12px 0}.warn{color:#e6c58b}
 @media(max-width:600px){main{margin:12px auto;padding:0 12px 36px}.panel{padding:14px}}
+
+/* 3D workflow visualization, driven by real job status */
+.workflow-head{display:flex;align-items:center;gap:17px;padding:14px 16px;background:#111a24;border:1px solid #2a3b4c;border-radius:13px;margin:16px 0;perspective:800px}
+.workflow-orb-wrap{width:88px;height:78px;flex:0 0 88px;display:grid;place-items:center;position:relative}
+.workflow-orb{width:48px;height:48px;border-radius:14px;border:1px solid #7da8c8;background:linear-gradient(145deg,#355d7b,#172635);display:grid;place-items:center;font-size:20px;color:#eaf5ff;transform:rotateX(18deg) rotateY(-25deg);box-shadow:8px 8px 0 #0b121b,9px 9px 0 1px #38566d;animation:workflow-float 4s ease-in-out infinite}
+.workflow-orbit{position:absolute;width:78px;height:30px;border:1px solid #7198b766;border-radius:50%;transform:rotate(-25deg)}
+.workflow-copy b{display:block;font-size:13px}.workflow-copy p{margin:4px 0 0;font-size:12px;color:#9aa8b8}
+.stage-track{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin:14px 0 5px}
+.stage{border:1px solid #303e4d;background:#121b25;border-radius:9px;padding:9px 7px;text-align:center;color:#8392a2;font-size:10px}
+.stage .stage-dot{display:block;width:8px;height:8px;border-radius:50%;background:#526273;margin:0 auto 6px}
+.stage.active{border-color:#6e9fc5;color:#d9eafa;background:#1b2b39}.stage.active .stage-dot{background:#8fc5ee}
+.stage.done{border-color:#426d5a;color:#bce7d0}.stage.done .stage-dot{background:#65b88d}
+.stage.blocked{border-color:#806a49;color:#e8d2ad}.stage.blocked .stage-dot{background:#c59a58}
+@keyframes workflow-float{0%,100%{transform:rotateX(18deg) rotateY(-25deg) translateY(0)}50%{transform:rotateX(-8deg) rotateY(25deg) translateY(-5px)}}
+@media(max-width:600px){.workflow-head{gap:10px;padding:11px}.workflow-orb-wrap{width:66px;flex-basis:66px}.workflow-orb{transform:scale(.82)}.stage-track{gap:4px}.stage{font-size:9px;padding:8px 3px}}
+@media(prefers-reduced-motion:reduce){.workflow-orb{animation:none}}
+
 </style></head><body><main>
 <p><a href="/">← Back to ClipPilot</a></p><h1>Campaign automation</h1>
 <p class="muted">Free public-web discovery · refreshes every 20 seconds</p>
-<div class="panel"><b>How free discovery works</b>
+<div class="workflow-head"><div class="workflow-orb-wrap"><div class="workflow-orbit"></div><div class="workflow-orb">✂</div></div><div class="workflow-copy"><b>ClipPilot workflow</b><p>Discovery and title matching are available. Permission review is manual; clipping and export are not triggered by this job yet.</p></div></div><div class="panel"><b>How free discovery works</b>
 <p>ClipPilot searches publicly accessible search-engine results for YouTube videos matching the saved campaign or creator name. No YouTube API key is needed.</p>
 <p class="warn">Search results may be incomplete or blocked. A matching title is only a candidate—not proof that it belongs to the creator or is eligible for clipping.</p>
 <p class="muted">Before editing, verify the channel, campaign rules and creator permission. ClipPilot does not download or publish videos.</p></div>
 {% for j in jobs %}<div class="panel"><b>{{j.campaign_name}}</b> <span class="tag">{{j.status}}</span>
-<p class="muted">Job #{{j.id}} · {{j.message}}</p>
+<p class="muted">Job #{{j.id}} · {{j.message}}</p><div class="stage-track">
+<div class="stage {% if j.status in ['queued','searching'] %}active{% elif j.status=='review_required' %}done{% elif j.status in ['limited','failed'] %}blocked{% endif %}"><span class="stage-dot"></span>Discover</div>
+<div class="stage {% if j.status=='searching' %}active{% elif j.status=='review_required' %}done{% elif j.status in ['limited','failed'] %}blocked{% endif %}"><span class="stage-dot"></span>Match</div>
+<div class="stage {% if j.status=='review_required' %}active{% elif j.status in ['limited','failed'] %}blocked{% endif %}"><span class="stage-dot"></span>Permission review</div>
+<div class="stage"><span class="stage-dot"></span>Clip / export</div>
+</div>
 {% for v in j.videos %}<div class="video"><b>{{v.title}}</b><p class="muted">{{v.channel_title}} · {{v.source}} · Title match: {{v.match_score}}%</p><p class="muted">{{v.match_note}}</p><a target="_blank" rel="noopener" href="{{v.url}}">Open YouTube video ↗</a></div>{% endfor %}</div>
 {% else %}<div class="panel">No jobs yet. Start discovery from a saved campaign.</div>{% endfor %}
 </main></body></html>
