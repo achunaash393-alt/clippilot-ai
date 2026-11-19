@@ -1,29 +1,28 @@
-# ClipPilot AI
+# ClipPilot AI — Neon UI Upgrade
 
-Cloud-deployable clipping campaign tracker and vertical-video utility.
+This package refreshes the existing Flask app with a responsive neon/cyberpunk interface and retains the current campaign discovery, campaign tracking, FFmpeg vertical clip rendering, and personal earnings tracker.
 
-## Current features
-- Manually save and compare campaigns.
-- Best-effort, user-triggered scanning of publicly accessible CLIPPING and Content Rewards directory pages. This may return no campaign cards when pages are JavaScript-rendered, blocked, or changed; it does not sign in or bypass access controls.
-- Create 9:16 clips from videos you own or are authorized to edit using FFmpeg.
-- Track your own campaign clip earnings in **My Earnings**: total recorded, approved, pending, rejected, views, clip/submission links, campaign association, and status history.
-- No wallet, payment processing, or money transfer functionality.
+## Included
+- Dark neon interface with cyan, electric-blue, violet and magenta accents
+- Responsive navigation for Overview, Campaign Finder, Clip Studio, My Clips, My Earnings and AI Connections
+- Campaign directory scan (best-effort public HTML scraping; not guaranteed to return all campaigns)
+- Manual campaign creation and status tracking
+- Upload-based FFmpeg vertical 9:16 clip rendering
+- Personal earnings records linked to saved campaigns, with pending/approved/rejected totals
+- No wallet, payment processing or money transfer functionality
 
-## Earnings data limitations
-Earnings are entered by the user based on figures shown in campaign accounts. The app does not independently fetch or verify marketplace payments, views, or approvals. Automatic verification would require authorized marketplace APIs or account integrations, which are not connected in this version. Keep pending and approved figures separate and only mark earnings approved after confirmation from the campaign platform.
+## Deploy
+1. Replace the existing repository root files with the files in this ZIP, including the `.github` folder.
+2. Commit and push to GitHub.
+3. Render should redeploy from the connected repository.
 
-## Run locally
-Requires Python 3.11+ and FFmpeg:
+## Requirements
+Python 3.12, Flask, Requests, BeautifulSoup and FFmpeg. The included Dockerfile installs FFmpeg.
 
-```bash
-pip install -r requirements.txt
-python app.py
-```
-
-Open http://localhost:5000.
-
-## Deploy to Render
-Upload the complete project files to the repository root and deploy using the included `render.yaml`. Configure a persistent disk and set `DATA_DIR` to its mount path if you need records and clips to survive restarts; the current free prototype may use ephemeral storage and can lose local data on redeploy/restart.
-
-## Not connected yet
-Automatic campaign discovery on a schedule, marketplace API integrations, AI moment detection, YouTube/Instagram publishing, and automatic earnings verification are not included. Never enter platform passwords or API secrets into campaign notes.
+## Important limitations
+- The campaign scanner reads public pages only and can fail when sites use JavaScript rendering, change markup, or block automated requests.
+- Earnings are manually recorded from figures visible in your campaign account; this app does not verify payouts automatically.
+- Clip rendering currently uses an uploaded source video and manually selected start/duration. AI moment detection, automatic YouTube creator discovery, live-stream capture, animated captions, ChatGPT/Gemini/Claude API connections, and the ChatGPT MCP connector are not implemented by this UI refresh.
+- Only process video you own or have permission to edit, and follow each campaign's clipping and publishing rules.
+- Render's `/tmp` data directory is ephemeral on the current free configuration. Use a persistent disk or managed database/storage before relying on long-term records.
+- API keys, if added later, must be stored as server-side environment variables and never embedded in browser code.

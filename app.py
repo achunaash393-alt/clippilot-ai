@@ -18,99 +18,33 @@ DB = DATA_DIR / "agent.db"
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "change-this-before-deploy")
 
-PAGE = """
-<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ClipPilot AI</title>
+PAGE = r"""
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ClipPilot AI — Neon Studio</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#0b1020;color:#e8edf8;font:15px Arial,sans-serif}
-header{padding:22px max(20px,calc((100% - 1100px)/2));background:#111a31;border-bottom:1px solid #26334f}
-main{max-width:1100px;margin:24px auto;padding:0 18px}.muted{color:#9eacc7}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
-.card{background:#121c33;border:1px solid #273653;border-radius:14px;padding:17px;margin-bottom:16px}
-h1{font-size:23px;margin:0 0 5px}h2{font-size:18px;margin:0 0 14px}
-input,select,textarea{width:100%;padding:11px;border-radius:8px;border:1px solid #344462;background:#0b1428;color:#fff;margin:5px 0 12px}
-button,.btn{background:#3978f6;color:white;border:0;padding:10px 14px;border-radius:8px;font-weight:bold;cursor:pointer;text-decoration:none;display:inline-block}
-table{width:100%;border-collapse:collapse}td,th{text-align:left;padding:10px;border-bottom:1px solid #273653;vertical-align:top}
-small{color:#9eacc7}.pill{padding:4px 8px;border-radius:99px;background:#20365f;font-size:12px}
-.metric{font-size:26px;font-weight:bold;margin-top:8px}.row{display:flex;gap:10px;flex-wrap:wrap}.row>*{flex:1;min-width:150px}
-a{color:#8db4ff}.notice{background:#2a2415;border:1px solid #6d5825;padding:12px;border-radius:9px;margin-bottom:15px}
-@media(max-width:650px){table{font-size:13px}td,th{padding:7px}}
+:root{--bg:#070912;--panel:#101426;--panel2:#151b31;--line:#252d4b;--text:#f3f5ff;--muted:#929bb8;--cyan:#23e7ff;--blue:#5478ff;--violet:#a855f7;--green:#36e0b2;--pink:#ff4fd8;--shadow:0 0 26px rgba(35,231,255,.07),0 12px 38px rgba(0,0,0,.24)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(ellipse at 75% -10%,rgba(84,120,255,.17),transparent 36%),radial-gradient(ellipse at 8% 18%,rgba(168,85,247,.10),transparent 30%),var(--bg);color:var(--text);font:14px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+a{color:#8ceeff;text-decoration:none}a:hover{color:#fff}button,.btn{border:1px solid rgba(35,231,255,.42);background:linear-gradient(110deg,rgba(35,231,255,.16),rgba(84,120,255,.22));color:#eefdff;padding:10px 15px;border-radius:10px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 0 18px rgba(35,231,255,.08);transition:.18s}button:hover,.btn:hover{transform:translateY(-1px);border-color:var(--cyan);box-shadow:0 0 22px rgba(35,231,255,.2)}input,select,textarea{width:100%;padding:11px 12px;border-radius:10px;border:1px solid #303956;background:#090e1d;color:#f5f7ff;margin:6px 0 13px;outline:none}input:focus,select:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(35,231,255,.09)}label{font-size:12px;font-weight:700;color:#b6c0df;letter-spacing:.03em}header{height:72px;position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:0 max(18px,calc((100% - 1440px)/2));background:rgba(7,9,18,.82);backdrop-filter:blur(18px);border-bottom:1px solid rgba(93,115,173,.22)}.brand{display:flex;align-items:center;gap:12px;font-size:18px;font-weight:850;letter-spacing:-.03em}.brandmark{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,var(--cyan),var(--blue),var(--violet));color:#070912;font-size:20px;box-shadow:0 0 24px rgba(35,231,255,.28)}.brand small{display:block;color:var(--muted);font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase}.topright{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px}.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 12px var(--green);display:inline-block}
+.shell{max-width:1440px;margin:auto;padding:24px 18px 60px;display:grid;grid-template-columns:220px minmax(0,1fr);gap:22px}.sidebar{align-self:start;position:sticky;top:92px;background:rgba(16,20,38,.74);border:1px solid var(--line);border-radius:17px;padding:14px;box-shadow:var(--shadow)}.navlabel{color:#687392;font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;padding:12px 10px 7px}.nav a{display:flex;align-items:center;gap:11px;padding:10px;border-radius:10px;color:#aeb8d6;margin:3px 0;font-size:13px}.nav a:hover,.nav a.active{background:linear-gradient(90deg,rgba(35,231,255,.12),rgba(84,120,255,.08));color:#f4fdff;border:1px solid rgba(35,231,255,.15)}.navicon{width:20px;text-align:center;color:var(--cyan);font-size:15px}.sidefoot{border-top:1px solid var(--line);margin-top:14px;padding:14px 8px 3px;color:var(--muted);font-size:11px}
+main{min-width:0}.hero{display:flex;align-items:flex-end;justify-content:space-between;gap:15px;margin:3px 0 20px}.eyebrow{color:var(--cyan);font-size:10px;font-weight:850;letter-spacing:.18em;text-transform:uppercase}.hero h1{font-size:clamp(25px,4vw,36px);letter-spacing:-.045em;line-height:1.1;margin:7px 0}.hero p{color:var(--muted);margin:0}.hero-actions{display:flex;gap:9px;flex-wrap:wrap}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px}.metric{position:relative;overflow:hidden;background:linear-gradient(145deg,rgba(21,27,49,.95),rgba(12,16,31,.96));border:1px solid var(--line);border-radius:15px;padding:17px;box-shadow:var(--shadow)}.metric:after{content:"";position:absolute;width:90px;height:90px;border-radius:50%;right:-35px;top:-40px;background:var(--glow,rgba(35,231,255,.16));filter:blur(22px)}.metric small{color:var(--muted);font-size:11px}.metric strong{display:block;font-size:25px;letter-spacing:-.04em;margin-top:6px}.metric .micon{float:right;color:var(--accent,var(--cyan));font-size:18px}.section{margin-top:19px;scroll-margin-top:92px}.card{background:linear-gradient(145deg,rgba(17,22,41,.96),rgba(12,16,30,.96));border:1px solid var(--line);border-radius:16px;padding:19px;margin-bottom:15px;box-shadow:var(--shadow)}.cardhead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:13px}.card h2{font-size:16px;letter-spacing:-.02em;margin:0}.card p{color:var(--muted)}.sub{color:var(--muted);font-size:12px;margin:5px 0 0}.tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:99px;background:rgba(35,231,255,.08);border:1px solid rgba(35,231,255,.18);color:#9cf5ff;font-size:10px;font-weight:800}.notice{background:rgba(255,184,77,.07);border:1px solid rgba(255,184,77,.26);padding:12px 14px;border-radius:11px;color:#e7d5ae;margin-bottom:15px;font-size:12px}.row{display:flex;gap:12px;flex-wrap:wrap}.row>*{flex:1;min-width:145px}.tablewrap{overflow-x:auto}table{width:100%;border-collapse:collapse;min-width:650px}td,th{text-align:left;padding:11px 9px;border-bottom:1px solid rgba(75,88,128,.28);vertical-align:top}th{color:#7f8aa9;font-size:10px;text-transform:uppercase;letter-spacing:.1em}td{font-size:12px;color:#dce3fa}small,.muted{color:var(--muted)}.pill{display:inline-block;padding:4px 8px;border-radius:99px;background:rgba(84,120,255,.13);border:1px solid rgba(84,120,255,.22);font-size:10px;color:#c3d0ff}.btn-secondary{background:rgba(255,255,255,.035);border-color:#343d5a;color:#c9d3ed;box-shadow:none}.btn-small{padding:7px 10px;font-size:11px}.two{display:grid;grid-template-columns:1fr 1fr;gap:15px}.empty{padding:22px;text-align:center;color:var(--muted);border:1px dashed #343d5a;border-radius:12px}.earn-total{font-size:30px;font-weight:850;letter-spacing:-.04em;color:#e9fbff}.status-approved{color:var(--green)}.status-pending{color:#ffd17c}.status-rejected{color:#ff7b9c}.flash{padding:10px 13px;border-radius:10px;background:rgba(54,224,178,.08);border:1px solid rgba(54,224,178,.22);margin-bottom:12px;color:#b9f9e7}
+@media(max-width:1000px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.shell{grid-template-columns:190px minmax(0,1fr)}}@media(max-width:720px){header{height:62px}.topright .statusword{display:none}.shell{display:block;padding:16px 12px 45px}.sidebar{position:static;margin-bottom:17px;padding:8px;overflow-x:auto}.nav{display:flex;gap:4px;min-width:max-content}.navlabel,.sidefoot{display:none}.nav a{padding:9px 11px}.nav a span:last-child{white-space:nowrap}.hero{display:block}.hero-actions{margin-top:14px}.card{padding:15px}.two{grid-template-columns:1fr}.grid{gap:9px}.metric{padding:13px}.metric strong{font-size:21px}}
 </style></head><body>
-<header><h1>✂️ ClipPilot AI</h1><div class="muted">Campaign ranking · clip production · submission tracker</div></header>
-<main>
-<div class="notice"><b>Starter mode:</b> campaign discovery and publishing integrations are not connected yet. Add campaigns you are eligible for, use footage you have permission to edit, and review submissions before sending.</div>
-<div class="grid">
-<div class="card"><small>Campaigns saved</small><div class="metric">{{ total }}</div></div>
-<div class="card"><small>Best estimated rate</small><div class="metric">{{ best_rate }}</div><small>per 1,000 eligible views</small></div>
-<div class="card"><small>Clips created</small><div class="metric">{{ clips }}</div></div>
-<div class="card"><small>Submissions tracked</small><div class="metric">{{ submitted }}</div></div>
-</div>
+<header><div class="brand"><div class="brandmark">✂</div><div>ClipPilot AI<small>Creator campaign intelligence</small></div></div><div class="topright"><span class="live-dot"></span><span class="statusword">SYSTEM ONLINE · LOCAL MVP</span><span class="tag">NEON STUDIO</span></div></header>
+<div class="shell"><aside class="sidebar"><div class="navlabel">Workspace</div><nav class="nav"><a class="active" href="#overview"><span class="navicon">◈</span><span>Overview</span></a><a href="#campaigns"><span class="navicon">⌕</span><span>Campaign Finder</span></a><a href="#clip-studio"><span class="navicon">▣</span><span>Clip Studio</span></a><a href="#my-clips"><span class="navicon">▶</span><span>My Clips</span></a><a href="#earnings"><span class="navicon">₹</span><span>My Earnings</span></a><a href="#connections"><span class="navicon">⌘</span><span>AI Connections</span></a></nav><div class="sidefoot">Built for creators<br><span style="color:#64718f">Campaigns · Clips · Insights</span></div></aside>
+<main><section id="overview" class="hero"><div><div class="eyebrow">Creator command centre</div><h1>Make every moment <span style="background:linear-gradient(90deg,var(--cyan),#9b8cff,var(--pink));background-clip:text;color:transparent">count.</span></h1><p>Your campaign workspace, clip production and earnings in one place.</p></div><div class="hero-actions"><a class="btn" href="#campaigns">＋ Add campaign</a><a class="btn btn-secondary" href="#clip-studio">Create a clip ↗</a></div></section>
+{% with messages = get_flashed_messages() %}{% for message in messages %}<div class="flash">{{message}}</div>{% endfor %}{% endwith %}
+<div class="notice"><b>Current capabilities:</b> manual campaign tracking, best-effort public directory scanning, FFmpeg vertical clipping and manually recorded earnings. AI moment detection, automatic creator discovery, live clipping and marketplace earnings verification still require integrations. Only process footage you own or are authorized to use.</div>
+<div class="grid"><div class="metric" style="--accent:var(--cyan);--glow:rgba(35,231,255,.2)"><span class="micon">◈</span><small>Campaigns saved</small><strong>{{total}}</strong></div><div class="metric" style="--accent:var(--violet);--glow:rgba(168,85,247,.2)"><span class="micon">↗</span><small>Best saved rate</small><strong>{{best_rate}}</strong><small>per 1,000 eligible views</small></div><div class="metric" style="--accent:var(--pink);--glow:rgba(255,79,216,.16)"><span class="micon">▣</span><small>Clips created</small><strong>{{clips}}</strong></div><div class="metric" style="--accent:var(--green);--glow:rgba(54,224,178,.16)"><span class="micon">✓</span><small>Submissions tracked</small><strong>{{submitted}}</strong></div></div>
+<section id="campaigns" class="section"><div class="card"><div class="cardhead"><div><div class="eyebrow">01 / Discover</div><h2>Campaign Finder</h2><p class="sub">Scan public campaign directories for visible listings.</p></div><span class="tag">PUBLIC SCAN</span></div><form method="post" action="/discover"><button type="submit">⌕ Scan public campaigns</button></form><div class="row" style="margin-top:12px"><a class="btn btn-secondary btn-small" href="https://contentrewards.com/c/discover" target="_blank" rel="noopener">Content Rewards ↗</a><a class="btn btn-secondary btn-small" href="https://clipping.net/c/discover" target="_blank" rel="noopener">CLIPPING ↗</a></div>{% if discovery_error %}<p class="notice" style="margin-top:12px">{{discovery_error}}</p>{% endif %}{% if discovered %}<h3 style="font-size:13px;margin-top:18px">Public results · {{discovered|length}}</h3><p class="sub">Verify eligibility, payment terms, deadlines and clipping rights on the campaign page.</p>{% for d in discovered %}<div style="border-top:1px solid var(--line);padding:12px 0"><b>{{d.name}}</b> <span class="pill">{{d.source}}</span>{% if d.pay %}<p style="margin:5px 0">{{d.pay}}</p>{% endif %}<small>{{d.detail}}</small><p style="margin:7px 0"><a href="{{d.url}}" target="_blank" rel="noopener">View campaign terms ↗</a></p></div>{% endfor %}{% endif %}</div>
+<div class="two"><div class="card"><div class="eyebrow">02 / Track</div><h2>Add a campaign</h2><p class="sub">Save campaign details you have verified.</p><form method="post" action="/campaign"><label>Campaign / creator name</label><input name="name" required placeholder="Creator or campaign name"><label>Campaign URL</label><input name="url" type="url" placeholder="https://..."><div class="row"><div><label>Pay per 1,000 views (₹)</label><input name="rate" type="number" min="0" step="0.01" required></div><div><label>Maximum payout (₹)</label><input name="cap" type="number" min="0" step="0.01"></div></div><label>Deadline</label><input name="deadline" type="date"><label>Rules / notes</label><textarea name="notes" rows="3" placeholder="Eligibility, platforms, minimum views, rights..."></textarea><button type="submit">Save campaign</button></form></div>
+<div class="card"><div class="eyebrow">03 / Compare</div><h2>Campaign ranking</h2><p class="sub">Transparent estimate based on saved rate, cap and deadline.</p>{% if campaigns %}<div class="tablewrap"><table><tr><th>Campaign</th><th>Rate / 1K</th><th>Score</th><th>Status</th></tr>{% for c in campaigns %}<tr><td><b>{{c.name}}</b><br><small>{{c.notes or ''}}</small>{% if c.url %}<br><a href="{{c.url}}" target="_blank" rel="noopener">Open ↗</a>{% endif %}</td><td>₹{{'%.2f'|format(c.rate)}}</td><td><span class="pill">{{c.score}}/100</span></td><td><form method="post" action="/status/{{c.id}}"><select name="status"><option {{'selected' if c.status=='research' else ''}}>research</option><option {{'selected' if c.status=='applied' else ''}}>applied</option><option {{'selected' if c.status=='accepted' else ''}}>accepted</option><option {{'selected' if c.status=='submitted' else ''}}>submitted</option><option {{'selected' if c.status=='paid' else ''}}>paid</option></select><button class="btn-small">Update</button></form></td></tr>{% endfor %}</table></div>{% else %}<div class="empty">No campaigns saved yet.</div>{% endif %}</div></div></section>
+<section id="clip-studio" class="section"><div class="card"><div class="cardhead"><div><div class="eyebrow">04 / Produce</div><h2>Clip Studio</h2><p class="sub">Turn an authorized source video segment into a vertical 9:16 MP4.</p></div><span class="tag">FFMPEG</span></div><form method="post" action="/make-clip" enctype="multipart/form-data"><label>Upload source video</label><input type="file" name="video" accept="video/*" required><div class="row"><div><label>Start time · seconds</label><input type="number" name="start" min="0" step="0.1" value="0" required></div><div><label>Duration · seconds (max 180)</label><input type="number" name="duration" min="1" max="180" step="0.1" value="30" required></div></div><button type="submit">✦ Render vertical clip</button></form></div></section>
+<section id="my-clips" class="section"><div class="card"><div class="eyebrow">05 / Library</div><h2>My Clips</h2><p class="sub">Download clips rendered by this app.</p>{% if clip_files %}{% for f in clip_files %}<div style="padding:9px 0;border-bottom:1px solid var(--line)"><span>▣ {{f}}</span><a style="float:right" href="/clips/{{f}}">Download ↓</a></div>{% endfor %}{% else %}<div class="empty">Your rendered clips will appear here.</div>{% endif %}</div></section>
+<section id="earnings" class="section"><div class="card"><div class="cardhead"><div><div class="eyebrow">06 / Revenue tracking</div><h2>My Earnings</h2><p class="sub">Record amounts shown in your campaign account. These are not independently verified by ClipPilot.</p></div><span class="tag">PERSONAL TRACKER</span></div><div class="grid" style="grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:16px"><div class="metric"><small>Total recorded</small><strong>₹{{'%.2f'|format(earnings_total)}}</strong></div><div class="metric"><small>Approved</small><strong style="color:var(--green)">₹{{'%.2f'|format(earnings_approved)}}</strong></div><div class="metric"><small>Pending</small><strong style="color:#ffd17c">₹{{'%.2f'|format(earnings_pending)}}</strong></div><div class="metric"><small>Rejected</small><strong style="color:#ff7b9c">₹{{'%.2f'|format(earnings_rejected)}}</strong></div></div><div class="two"><form method="post" action="/earnings"><label>Campaign</label><select name="campaign_id" required>{% for c in campaigns %}<option value="{{c.id}}">{{c.name}}</option>{% endfor %}</select><label>Clip name</label><input name="clip_name" placeholder="Clip title" required><div class="row"><div><label>Views</label><input name="views" type="number" min="0" value="0"></div><div><label>Recorded earnings (₹)</label><input name="amount" type="number" min="0" step="0.01" required></div></div><label>Clip / submission URL</label><input name="clip_url" type="url" placeholder="https://..."><label>Status</label><select name="status"><option value="pending">pending</option><option value="approved">approved</option><option value="rejected">rejected</option></select><label>Notes</label><textarea name="notes" rows="2"></textarea><button type="submit">＋ Record earnings</button></form><div><h3 style="font-size:13px;margin-top:0">Earnings history</h3>{% if earnings %}<div class="tablewrap"><table><tr><th>Clip / campaign</th><th>Amount</th><th>Status</th></tr>{% for e in earnings %}<tr><td><b>{{e.clip_name}}</b><br><small>{{e.campaign_name}} · {{e.views}} views</small>{% if e.clip_url %}<br><a href="{{e.clip_url}}" target="_blank" rel="noopener">Open clip ↗</a>{% endif %}</td><td>₹{{'%.2f'|format(e.amount)}}</td><td><form method="post" action="/earnings/{{e.id}}"><select name="status"><option value="pending" {{'selected' if e.status=='pending' else ''}}>pending</option><option value="approved" {{'selected' if e.status=='approved' else ''}}>approved</option><option value="rejected" {{'selected' if e.status=='rejected' else ''}}>rejected</option></select><button class="btn-small">Save</button></form></td></tr>{% endfor %}</table></div>{% else %}<div class="empty">No earnings recorded yet.</div>{% endif %}</div></div></div></section>
+<section id="connections" class="section"><div class="card"><div class="eyebrow">07 / Integrations</div><h2>AI Connections</h2><p class="sub">Provider connections are not configured in this build. When added, use server-side API keys and never expose secrets in browser code.</p><div class="row"><span class="pill">ChatGPT · Not connected</span><span class="pill">Gemini · Not connected</span><span class="pill">Claude · Not connected</span></div><p class="sub" style="margin-top:14px">No wallet or payment processing is included. Campaign payments remain on the campaign platform.</p></div></section>
+</main></div></body></html>
 
-<div class="card">
-<h2>1. Find public campaigns automatically</h2>
-<p class="muted">Scan public campaign directories. This does not sign in, bypass access controls, apply, or submit anything for you.</p>
-<form method="post" action="/discover">
-<button type="submit">🔎 Search public campaigns now</button>
-</form>
-<div class="row" style="margin-top:12px">
-<a class="btn" href="https://contentrewards.com/c/discover" target="_blank" rel="noopener">Open Content Rewards</a>
-<a class="btn" href="https://clipping.net/c/discover" target="_blank" rel="noopener">Open CLIPPING</a>
-</div>
-{% if discovery_error %}<p class="notice">{{ discovery_error }}</p>{% endif %}
-{% if discovered %}
-<h3>Public results ({{ discovered|length }})</h3>
-<p class="muted">Rates and availability are copied from the public listing and may change. Open each campaign and verify eligibility, rights, platform rules, minimum views and remaining budget before applying.</p>
-{% for d in discovered %}
-<div style="border-top:1px solid #273653;padding:12px 0">
-<b>{{ d.name }}</b> <span class="pill">{{ d.source }}</span>
-{% if d.pay %}<p style="margin:6px 0">Pay: {{ d.pay }}</p>{% endif %}
-{% if d.detail %}<small>{{ d.detail }}</small>{% endif %}
-<p style="margin:8px 0"><a href="{{ d.url }}" target="_blank" rel="noopener">Open campaign / verify terms ↗</a></p>
-</div>
-{% endfor %}
-{% endif %}
-</div>
-<div class="card"><h2>2. Add a campaign manually</h2>
-<form method="post" action="/campaign">
-<label>Campaign / creator name</label><input name="name" required placeholder="e.g. Creator campaign">
-<label>Campaign URL</label><input name="url" type="url" placeholder="https://...">
-<div class="row"><div><label>Pay per 1,000 views (₹)</label><input name="rate" type="number" min="0" step="0.01" required></div>
-<div><label>Maximum payout (₹, optional)</label><input name="cap" type="number" min="0" step="0.01"></div>
-<div><label>Deadline (optional)</label><input name="deadline" type="date"></div></div>
-<label>Requirements / notes</label><textarea name="notes" rows="2" placeholder="Allowed platforms, minimum views, source footage rules..."></textarea>
-<button type="submit">Save campaign</button></form></div>
-<div class="card"><h2>3. Campaign comparison</h2>
-{% if campaigns %}<table><tr><th>Campaign</th><th>Rate / 1K</th><th>Cap</th><th>Deadline</th><th>Score</th><th>Action</th></tr>
-{% for c in campaigns %}<tr><td><b>{{c.name}}</b><br><small>{{c.notes or ''}}</small>{% if c.url %}<br><a href="{{c.url}}" target="_blank" rel="noopener">Open campaign ↗</a>{% endif %}</td>
-<td>₹{{"%.2f"|format(c.rate)}}</td><td>{{ "₹%.0f"|format(c.cap) if c.cap else "—" }}</td><td>{{c.deadline or "—"}}</td><td><span class="pill">{{c.score}} / 100</span></td>
-<td><form method="post" action="/status/{{c.id}}"><select name="status"><option {{'selected' if c.status=='research' else ''}}>research</option><option {{'selected' if c.status=='applied' else ''}}>applied</option><option {{'selected' if c.status=='accepted' else ''}}>accepted</option><option {{'selected' if c.status=='submitted' else ''}}>submitted</option><option {{'selected' if c.status=='paid' else ''}}>paid</option></select><button>Update</button></form></td></tr>{% endfor %}</table>
-{% else %}<p class="muted">No campaigns yet. Add your first campaign above.</p>{% endif %}</div>
-<div class="card"><h2>4. My Earnings</h2>
-<p class="muted">Track income generated by your own submitted clips. Amounts are not fetched automatically from marketplaces yet; enter the figures shown in your campaign account. Only mark earnings approved when the campaign confirms them.</p>
-<div class="grid">
-<div class="card"><small>Total recorded earnings</small><div class="metric">₹{{"%.2f"|format(earned)}}</div></div>
-<div class="card"><small>Approved</small><div class="metric">₹{{"%.2f"|format(approved)}}</div></div>
-<div class="card"><small>Pending</small><div class="metric">₹{{"%.2f"|format(pending)}}</div></div>
-<div class="card"><small>Rejected</small><div class="metric">₹{{"%.2f"|format(rejected)}}</div></div>
-</div>
-<form method="post" action="/earnings">
-<div class="row"><div><label>Campaign</label><select name="campaign_id"><option value="">Select campaign (optional)</option>{% for c in campaigns %}<option value="{{c.id}}">{{c.name}}</option>{% endfor %}</select></div>
-<div><label>Clip / submission name</label><input name="clip_name" required placeholder="e.g. Podcast highlights #1"></div></div>
-<div class="row"><div><label>Clip or submission URL</label><input name="clip_url" type="url" placeholder="https://..."></div><div><label>Views reported</label><input name="views" type="number" min="0" value="0"></div><div><label>Earned amount (₹)</label><input name="amount" type="number" min="0" step="0.01" required value="0"></div></div>
-<div class="row"><div><label>Earning status</label><select name="status"><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Rejected</option></select></div><div><label>Notes / rejection reason</label><input name="notes" placeholder="Optional evidence or reason"></div></div>
-<button type="submit">Save earning record</button></form>
-{% if earnings %}<h3>My campaign earnings history</h3><table><tr><th>Clip / campaign</th><th>Views</th><th>Amount</th><th>Status</th><th>Update</th></tr>
-{% for e in earnings %}<tr><td><b>{{e.clip_name}}</b><br><small>{{e.campaign_name or 'Campaign not linked'}}</small>{% if e.clip_url %}<br><a href="{{e.clip_url}}" target="_blank" rel="noopener">Open submission ↗</a>{% endif %}{% if e.notes %}<br><small>{{e.notes}}</small>{% endif %}</td><td>{{e.views}}</td><td>₹{{"%.2f"|format(e.amount)}}</td><td><span class="pill">{{e.status}}</span></td><td><form method="post" action="/earnings/{{e.id}}"><select name="status"><option value="pending" {{'selected' if e.status=='pending' else ''}}>pending</option><option value="approved" {{'selected' if e.status=='approved' else ''}}>approved</option><option value="rejected" {{'selected' if e.status=='rejected' else ''}}>rejected</option></select><button>Update</button></form></td></tr>{% endfor %}</table>{% else %}<p class="muted">No earnings recorded yet. Add your first campaign clip above when you have an earnings figure.</p>{% endif %}
-</div>
-<div class="card"><h2>5. Create a short clip</h2><p class="muted">Upload a video file you own or are authorized to edit. This uses FFmpeg to crop a selected segment into a vertical 9:16 MP4.</p>
-<form method="post" action="/make-clip" enctype="multipart/form-data">
-<label>Source video</label><input type="file" name="video" accept="video/*" required>
-<div class="row"><div><label>Start time (seconds)</label><input type="number" name="start" min="0" step="0.1" value="0" required></div><div><label>Duration (seconds)</label><input type="number" name="duration" min="1" max="180" step="0.1" value="30" required></div></div>
-<button type="submit">Create vertical clip</button></form>
-{% if clip_files %}<p><b>Created clips</b></p>{% for f in clip_files %}<p><a href="/clips/{{f}}">{{f}} ↓</a></p>{% endfor %}{% endif %}
-</div>
-<div class="card"><h2>6. Important next integrations</h2><p class="muted">Connect approved campaign APIs or feeds, AI moment detection, YouTube OAuth, Instagram professional-account publishing, and payout reporting. Never enter platform passwords here.</p>
-</div>
-</main></body></html>
 """
 
 def db():
@@ -121,16 +55,10 @@ def db():
         rate REAL NOT NULL, cap REAL, deadline TEXT, notes TEXT,
         status TEXT DEFAULT 'research', created TEXT NOT NULL)""")
     con.execute("""CREATE TABLE IF NOT EXISTS earnings(
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        campaign_id INTEGER,
-        clip_name TEXT NOT NULL,
-        clip_url TEXT,
-        views INTEGER DEFAULT 0,
-        amount REAL NOT NULL DEFAULT 0,
-        status TEXT NOT NULL DEFAULT 'pending',
-        notes TEXT,
-        created TEXT NOT NULL,
-        FOREIGN KEY(campaign_id) REFERENCES campaigns(id))""")
+        id INTEGER PRIMARY KEY AUTOINCREMENT, campaign_id INTEGER NOT NULL,
+        clip_name TEXT NOT NULL, clip_url TEXT, views INTEGER DEFAULT 0,
+        amount REAL NOT NULL, status TEXT DEFAULT 'pending', notes TEXT,
+        created TEXT NOT NULL, FOREIGN KEY(campaign_id) REFERENCES campaigns(id))""")
     con.commit()
     return con
 
@@ -157,15 +85,17 @@ def home():
     files = sorted([p.name for p in OUTPUT_DIR.glob("*.mp4")], reverse=True)
     best = max([float(r["rate"]) for r in rows], default=0)
     counts = {s: sum(1 for r in rows if r["status"] == s) for s in ["submitted","paid"]}
-    earnings = con.execute("""SELECT e.*, c.name AS campaign_name FROM earnings e
-        LEFT JOIN campaigns c ON c.id=e.campaign_id ORDER BY e.created DESC, e.id DESC""").fetchall()
+    earnings_rows = con.execute("""SELECT e.*, c.name AS campaign_name FROM earnings e
+        LEFT JOIN campaigns c ON c.id=e.campaign_id ORDER BY e.id DESC LIMIT 100""").fetchall()
     totals = con.execute("SELECT status, COALESCE(SUM(amount),0) AS amount FROM earnings GROUP BY status").fetchall()
-    money = {r["status"]: float(r["amount"] or 0) for r in totals}
+    amounts = {r["status"]: float(r["amount"] or 0) for r in totals}
+    earnings_total = sum(amounts.values())
     con.close()
     return render_template_string(PAGE, total=len(rows), best_rate=f"₹{best:.2f}", clips=len(files),
         submitted=counts["submitted"]+counts["paid"], campaigns=campaigns, clip_files=files,
-        earnings=[dict(e) for e in earnings], earned=sum(money.values()), approved=money.get("approved",0),
-        pending=money.get("pending",0), rejected=money.get("rejected",0),
+        earnings=[dict(e) for e in earnings_rows], earnings_total=earnings_total,
+        earnings_approved=amounts.get("approved",0), earnings_pending=amounts.get("pending",0),
+        earnings_rejected=amounts.get("rejected",0),
         discovered=session.get("discovered_campaigns", []), discovery_error=session.pop("discovery_error", None))
 
 
@@ -289,32 +219,40 @@ def update_status(cid):
     con = db(); con.execute("UPDATE campaigns SET status=? WHERE id=?", (status,cid)); con.commit(); con.close()
     return redirect(url_for("home"))
 
+
 @app.post("/earnings")
 def add_earning():
     f = request.form
     try:
-        amount = float(f.get("amount", 0)); views = int(f.get("views", 0))
-        campaign_id = int(f["campaign_id"]) if f.get("campaign_id") else None
-        if amount < 0 or views < 0: raise ValueError()
+        campaign_id = int(f.get("campaign_id", ""))
+        views = max(0, int(f.get("views", 0)))
+        amount = float(f.get("amount", 0))
+        if amount < 0: raise ValueError()
     except (ValueError, TypeError):
-        return "Enter a valid non-negative amount and view count.", 400
+        flash("Enter a valid campaign, view count and non-negative earnings amount.")
+        return redirect(url_for("home") + "#earnings")
     status = f.get("status", "pending")
-    if status not in {"pending", "approved", "rejected"}: return "Invalid earning status", 400
+    if status not in {"pending", "approved", "rejected"}:
+        return "Invalid status", 400
     con = db()
-    if campaign_id is not None and not con.execute("SELECT 1 FROM campaigns WHERE id=?", (campaign_id,)).fetchone():
-        con.close(); return "Campaign not found", 404
-    con.execute("INSERT INTO earnings(campaign_id,clip_name,clip_url,views,amount,status,notes,created) VALUES(?,?,?,?,?,?,?,?)",
-        (campaign_id, f.get("clip_name", "").strip(), f.get("clip_url", "").strip(), views, amount, status,
-         f.get("notes", "").strip(), datetime.utcnow().isoformat()))
+    exists = con.execute("SELECT id FROM campaigns WHERE id=?", (campaign_id,)).fetchone()
+    if not exists:
+        con.close(); flash("Select a saved campaign first.")
+        return redirect(url_for("home") + "#earnings")
+    con.execute("""INSERT INTO earnings(campaign_id,clip_name,clip_url,views,amount,status,notes,created)
+        VALUES(?,?,?,?,?,?,?,?)""", (campaign_id, f.get("clip_name", "").strip(),
+        f.get("clip_url", "").strip(), views, amount, status, f.get("notes", "").strip(),
+        datetime.utcnow().isoformat()))
     con.commit(); con.close()
-    return redirect(url_for("home"))
+    return redirect(url_for("home") + "#earnings")
 
 @app.post("/earnings/<int:eid>")
 def update_earning(eid):
     status = request.form.get("status", "pending")
-    if status not in {"pending", "approved", "rejected"}: return "Invalid earning status", 400
+    if status not in {"pending", "approved", "rejected"}:
+        return "Invalid status", 400
     con = db(); con.execute("UPDATE earnings SET status=? WHERE id=?", (status, eid)); con.commit(); con.close()
-    return redirect(url_for("home"))
+    return redirect(url_for("home") + "#earnings")
 
 @app.post("/make-clip")
 def make_clip():
