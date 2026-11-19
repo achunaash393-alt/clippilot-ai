@@ -17,10 +17,11 @@ HTML = """
 <!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="refresh" content="20"><title>ClipPilot Automation</title>
 <style>
-:root{color-scheme:dark}body{background:#080b16;color:#edf4ff;font:14px system-ui;margin:0}
-main{max-width:900px;margin:28px auto;padding:0 16px}.panel{background:#12182b;border:1px solid #293957;border-radius:14px;padding:17px;margin:14px 0}
-a{color:#6deaff}.muted{color:#9aa8c7}.tag{color:#8ef1ff;border:1px solid #35536b;border-radius:20px;padding:4px 9px;font-size:11px}
-.video{border-top:1px solid #28334d;padding:10px 0}.warn{color:#ffd27d}
+:root{color-scheme:dark}*{box-sizing:border-box}body{background:#0d1118;color:#edf2f7;font:14px/1.55 system-ui;margin:0}
+main{max-width:960px;margin:24px auto;padding:0 16px 48px}.panel{background:#151c26;border:1px solid #2a3544;border-radius:12px;padding:17px;margin:14px 0}
+a{color:#8fc5ee;text-decoration:none}a:hover{color:#c5e4fb}.muted{color:#9aa8b8}.tag{color:#c4d8e9;border:1px solid #3b4d60;border-radius:20px;padding:4px 9px;font-size:11px}
+.video{border-top:1px solid #2a3544;padding:12px 0}.warn{color:#e6c58b}
+@media(max-width:600px){main{margin:12px auto;padding:0 12px 36px}.panel{padding:14px}}
 </style></head><body><main>
 <p><a href="/">← Back to ClipPilot</a></p><h1>Campaign automation</h1>
 <p class="muted">Free public-web discovery · refreshes every 20 seconds</p>
