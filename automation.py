@@ -59,6 +59,21 @@ a{color:#91c6eb}a:hover{color:#d7edfb}
 @media(max-width:600px){main{margin:13px auto;padding:0 12px 38px}h1{font-size:25px}.panel{padding:14px}.workflow-head{padding:12px}.stage{font-size:9px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
+
+/* ClipPilot typography + text motion v1 */
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+body{font-family:'DM Sans','Avenir Next','Segoe UI',sans-serif;font-feature-settings:'ss01' on}
+h1,h2,h3,.workflow-copy b{font-family:'Space Grotesk','DM Sans',sans-serif;letter-spacing:-.035em}
+h1{animation:text-rise .65s both}
+.workflow-copy b{animation:text-rise .6s .08s both}
+.workflow-copy p{animation:text-rise .65s .15s both}
+.panel> b{animation:text-soft-in .5s both}
+.video b{font-family:'DM Sans',sans-serif;font-weight:650}
+a{transition:color .18s ease}
+@keyframes text-rise{from{opacity:0;transform:translateY(9px);filter:blur(2px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+@keyframes text-soft-in{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){h1,.workflow-copy b,.workflow-copy p,.panel>b{animation:none!important}}
+
 </style></head><body><main>
 <p><a href="/">← Back to ClipPilot</a></p><h1>Campaign automation</h1>
 <p class="muted">Free public-web discovery · refreshes every 20 seconds</p>
